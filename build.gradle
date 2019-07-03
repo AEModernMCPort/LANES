@@ -5,7 +5,7 @@ plugins {
 }
 
 repositories {
-    jcenter()
+	jcenter()
 }
 
 sourceCompatibility = java_version
@@ -35,18 +35,18 @@ test {
 }
 
 task generatePom {
-    doLast {
+	doLast {
 		def pomFile = "$buildDir/libs/$archivesBaseName-${version}.pom"
-        pom {
-            project {
-                name publish_name
+		pom {
+			project {
+				name publish_name
 				description publish_desc
 				url 'https://github.com/${github_repo_full}'
-                licenses {
-                    license {
-                        
-                    }
-                }
+				licenses {
+					license {
+						
+					}
+				}
 				developers {
 					developer {
 						name 'Elix X'
@@ -59,11 +59,11 @@ task generatePom {
 					developerConnection 'scm:git:ssh://github.com:${github_repo_full}.git'
 					url 'https://github.com/${github_repo_full}/tree/master'
 				}
-            }
-        }.writeTo(pomFile)
+			}
+		}.writeTo(pomFile)
 		ant.checksum file: pomFile
 		ant.checksum(file: pomFile, algorithm: 'SHA')
-    }
+	}
 }
 
 javadoc {
@@ -73,7 +73,7 @@ javadoc {
 
 task sourcesJar(type: Jar){
 	classifier = "sources"
-    from sourceSets.main.allJava
+	from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar, dependsOn: 'javadoc'){
@@ -82,7 +82,7 @@ task javadocJar(type: Jar, dependsOn: 'javadoc'){
 }
 
 tasks.withType(Jar){ task ->
-    task.doLast {
+	task.doLast {
 		ant.checksum file: task.archivePath
 		ant.checksum(file: task.archivePath, algorithm: 'SHA')
 	}
