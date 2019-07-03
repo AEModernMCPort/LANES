@@ -1,0 +1,16 @@
+﻿# GRADLE
+.gradle
+build/
+bin/
+
+# ECLIPSE
+.project
+.classpath
+.settings/
+eclipse/*
+
+# IDEA
+.idea/
+out/
+*.iml
+classes/*

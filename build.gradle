@@ -1,0 +1,117 @@
+plugins {
+	id 'java-library'
+	id 'maven'
+	id 'maven-publish'
+}
+
+repositories {
+    jcenter()
+}
+
+sourceCompatibility = java_version
+targetCompatibility = java_version_target
+
+dependencies {
+	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
+}
+
+if(!project.hasProperty('publish_name')) ext.publish_name = project.name
+if(!project.hasProperty('github_repo')) ext.github_repo = publish_name
+ext.github_repo_full = github_owner + '/' + github_repo
+
+archivesBaseName = publish_name
+version = "${version_major}.${version_minor}.${version_patch}"
+if(version_channel != ''){
+	version += "-$version_channel"
+	if(version_pre != '') version += ".$version_pre"
+}
+group = publish_group
+
+test {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+	}
+}
+
+task generatePom {
+    doLast {
+		def pomFile = "$buildDir/libs/$archivesBaseName-${version}.pom"
+        pom {
+            project {
+                name publish_name
+				description publish_desc
+				url 'https://github.com/${github_repo_full}'
+                licenses {
+                    license {
+                        
+                    }
+                }
+				developers {
+					developer {
+						name 'Elix X'
+						email 'elix.x.ggl@gmail.com'
+						url 'https://github.com/Elix-x'
+					}
+				}
+				scm {
+					connection 'scm:git:git://github.com/${github_repo_full}.git'
+					developerConnection 'scm:git:ssh://github.com:${github_repo_full}.git'
+					url 'https://github.com/${github_repo_full}/tree/master'
+				}
+            }
+        }.writeTo(pomFile)
+		ant.checksum file: pomFile
+		ant.checksum(file: pomFile, algorithm: 'SHA')
+    }
+}
+
+javadoc {
+	failOnError = false
+	options.addBooleanOption('html5', true)
+}
+
+task sourcesJar(type: Jar){
+	classifier = "sources"
+    from sourceSets.main.allJava
+}
+
+task javadocJar(type: Jar, dependsOn: 'javadoc'){
+	classifier = "javadoc"
+	from javadoc
+}
+
+tasks.withType(Jar){ task ->
+    task.doLast {
+		ant.checksum file: task.archivePath
+		ant.checksum(file: task.archivePath, algorithm: 'SHA')
+	}
+}
+
+task postBuild(dependsOn: ['sourcesJar', 'javadocJar', 'generatePom']){
+
+}
+
+assemble.finalizedBy postBuild
+
+
+//4Future - It is not yet clear how to correctly deploy to GitHub package registry with gradle in CI
+/*
+publishing {
+	publications {
+		mavenJava(MavenPublication){
+			pom {
+				//...
+			}
+		}
+	}
+	//Unchecked!
+	repositories {
+		maven {
+			id 'github'
+			name 'GitHub ${gitOwner} Apache Maven Packages'
+			url 'https://maven.pkg.github.com/${gitRepoFull}'
+		}
+	}
+}
+*/

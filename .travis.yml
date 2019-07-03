@@ -1,0 +1,23 @@
+language: java
+jdk:
+  - oraclejdk12
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+
+deploy:
+  - provider: releases
+    api_key:
+      secure: $GITHUBACCESSTOKEN
+    file_glob: true
+    file: "./build/libs/*.jar"
+    skip_cleanup: true
+    on:
+      tags: true
+# - Deployment to GitHub package registry - TODO
