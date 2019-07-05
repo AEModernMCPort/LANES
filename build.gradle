@@ -5,6 +5,8 @@ plugins {
 	id "org.checkerframework" version "0.3.4"
 }
 
+apply plugin: 'org.checkerframework'
+
 repositories {
 	jcenter()
 }
@@ -15,6 +17,13 @@ targetCompatibility = java_version_target
 dependencies {
 	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
 }
+
+/*Awaiting checkerframework for Java 12...
+checkerFramework {
+	checkers = [
+			'org.checkerframework.checker.nullness.NullnessChecker'
+	]
+}*/
 
 if(!project.hasProperty('publish_name')) ext.publish_name = project.name
 if(!project.hasProperty('github_repo')) ext.github_repo = publish_name
