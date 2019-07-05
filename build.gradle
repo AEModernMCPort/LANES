@@ -14,6 +14,9 @@ repositories {
 sourceCompatibility = java_version
 targetCompatibility = java_version_target
 
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
+
 dependencies {
 	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
 }
