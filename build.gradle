@@ -2,6 +2,7 @@ plugins {
 	id 'java-library'
 	id 'maven'
 	id 'maven-publish'
+	id "org.checkerframework" version "0.3.4"
 }
 
 repositories {
