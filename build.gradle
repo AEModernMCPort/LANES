@@ -28,6 +28,21 @@ checkerFramework {
 	]
 }*/
 
+sourceSets {
+	samples {
+		java {
+			srcDir 'src/samples/java'
+		}
+		resources {
+			srcDir 'src/samples/resources'
+		}
+	}
+	test {
+		compileClasspath += sourceSets.samples.compileClasspath
+		runtimeClasspath += sourceSets.samples.runtimeClasspath
+	}
+}
+
 if(!project.hasProperty('publish_name')) ext.publish_name = project.name
 if(!project.hasProperty('github_repo')) ext.github_repo = publish_name
 ext.github_repo_full = github_owner + '/' + github_repo
