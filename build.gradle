@@ -17,17 +17,6 @@ targetCompatibility = java_version_target
 compileJava.options.encoding = "UTF-8"
 compileTestJava.options.encoding = "UTF-8"
 
-dependencies {
-	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
-}
-
-/*Awaiting checkerframework for Java 12...
-checkerFramework {
-	checkers = [
-			'org.checkerframework.checker.nullness.NullnessChecker'
-	]
-}*/
-
 sourceSets {
 	samples {
 		java {
@@ -37,11 +26,22 @@ sourceSets {
 			srcDir 'src/samples/resources'
 		}
 	}
-	test {
-		compileClasspath += sourceSets.samples.compileClasspath
-		runtimeClasspath += sourceSets.samples.runtimeClasspath
-	}
 }
+
+dependencies {
+	samplesCompile sourceSets.main.compileClasspath
+	samplesCompile sourceSets.main.output
+
+	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
+	testCompile sourceSets.samples.output
+}
+
+/*Awaiting checkerframework for Java 12...
+checkerFramework {
+	checkers = [
+			'org.checkerframework.checker.nullness.NullnessChecker'
+	]
+}*/
 
 if(!project.hasProperty('publish_name')) ext.publish_name = project.name
 if(!project.hasProperty('github_repo')) ext.github_repo = publish_name
