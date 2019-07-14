@@ -15,7 +15,7 @@ public interface ConnectParam<L extends Layer<L, CP>, CP extends ConnectParam<L,
 	 * Checks whether this cp is sufficient for given cp.<br>
 	 * For linear parameters, this method is equivalent to <code>this >= param</code>.
 	 * @param param second cp to check with
-	 * @return <code>cp ⊂ this</code>
+	 * @return <code>this ⊃ cp</code>
 	 */
 	boolean isSufficientFor(@NonNull CP param);
 
