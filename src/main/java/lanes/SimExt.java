@@ -15,4 +15,4 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.CLASS)
 @Target({ElementType.METHOD, ElementType.FIELD, ElementType.TYPE_PARAMETER})
-public @interface SimInt {}
+public @interface SimExt {}
