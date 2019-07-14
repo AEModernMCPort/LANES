@@ -2,10 +2,11 @@ package lanes;
 
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.units.qual.C;
 
 import java.util.stream.Stream;
 
-public interface ConnectParam<L extends Layer<L, CP>, CP extends ConnectParam<L, CP>> {
+public interface ConnectParam<CP extends ConnectParam<CP>> {
 
 	private CP cast(){
 		return (CP) this;
@@ -78,17 +79,17 @@ public interface ConnectParam<L extends Layer<L, CP>, CP extends ConnectParam<L,
 	}
 
 	@NonNull
-	static <L extends Layer<L, C>, C extends ConnectParam<L, C>> C sum(L layer, Stream<C> cps){
+	static <C extends ConnectParam<C>, L extends Layer<C, L>> C sum(L layer, Stream<C> cps){
 		return layer.zeroCP().sumWith(cps);
 	}
 
 	@NonNull
-	static <L extends Layer<L, C>, C extends ConnectParam<L, C>> C union(L layer, Stream<C> cps){
+	static <C extends ConnectParam<C>, L extends Layer<C, L>> C union(L layer, Stream<C> cps){
 		return layer.zeroCP().unionWith(cps);
 	}
 
 	@NonNull
-	static <L extends Layer<L, C>, C extends ConnectParam<L, C>> C intersection(L layer, Stream<C> cps){
+	static <C extends ConnectParam<C>, L extends Layer<C, L>> C intersection(L layer, Stream<C> cps){
 		return layer.infCP().intersectionWith(cps);
 	}
 

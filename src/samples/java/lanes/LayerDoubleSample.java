@@ -1,6 +1,6 @@
 package lanes;
 
-public class LayerDoubleSample extends Layer<LayerDoubleSample, ConnectParamDoubleSample> {
+public class LayerDoubleSample extends Layer<ConnectParamDoubleSample, LayerDoubleSample> {
 
 	public LayerDoubleSample(String name){
 		super(name);

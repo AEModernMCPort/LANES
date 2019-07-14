@@ -3,7 +3,7 @@ package lanes;
 import lanes.util.reg.NamedRegistry;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public abstract class Layer<L extends Layer<L, CP>, CP extends ConnectParam<L, CP>> implements NamedRegistry.Entry<L> {
+public abstract class Layer<CP extends ConnectParam<CP>, L extends Layer<CP, L>> implements NamedRegistry.Entry<L> {
 
 	public final String name;
 

@@ -3,7 +3,7 @@ package lanes;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-public class ConnectParamDoubleSample implements ConnectParam<LayerDoubleSample, ConnectParamDoubleSample> {
+public class ConnectParamDoubleSample implements ConnectParam<ConnectParamDoubleSample> {
 
 	public static final ConnectParamDoubleSample	ZERO = new ConnectParamDoubleSample(0),
 													ONE = new ConnectParamDoubleSample(1),
