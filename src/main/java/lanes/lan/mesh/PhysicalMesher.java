@@ -27,6 +27,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 	protected void removeMeshRaw(@NonNull MeshId mesh){ meshes.remove(mesh); }
 	protected void removeMeshRaw(@NonNull Mesh mesh){ removeMeshRaw(mesh.ID); }
 
+	protected Mesh newMesh(){ return new Mesh(); }
 	public class Mesh {
 
 		public final MeshId ID;
@@ -77,9 +78,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 	 * Changes
 	 */
 
-	protected ChangeSetBasic newChangeSetBasic(@NonNull List<CPTChange> cptChanges, @NonNull List<Mesh> changed, @NonNull List<Mesh> destroyed, @NonNull List<Mesh> created){
-		return new ChangeSetBasic(cptChanges, changed, destroyed, created);
-	}
+	protected ChangeSetBasic newChangeSetBasic(@NonNull List<CPTChange> cptChanges, @NonNull List<Mesh> changed, @NonNull List<Mesh> destroyed, @NonNull List<Mesh> created){ return new ChangeSetBasic(cptChanges, changed, destroyed, created); }
 	public class ChangeSetBasic {
 
 		protected final List<Mesh> changed, destroyed, created;
@@ -187,9 +186,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 
 	}
 
-	protected ChangeSetPrimitive newChangeSetPrimitive(@NonNull Function<MeshElemId, MeshElem> elemSupp){
-		return new ChangeSetPrimitive(elemSupp);
-	}
+	protected ChangeSetPrimitive newChangeSetPrimitive(@NonNull Function<MeshElemId, MeshElem> elemSupp){ return new ChangeSetPrimitive(elemSupp); }
 	public class ChangeSetPrimitive {
 
 		private final Function<MeshElemId, MeshElem> elemSupp;
@@ -225,12 +222,12 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 
 		@NonNull
 		protected Node createNode(@NonNull CPTId cpt){
-			return created(new Node(cpt));
+			return created(newNode(cpt));
 		}
 
 		@NonNull
 		protected Link createLink(@NonNull Node from, @NonNull Node to, List<CPTId> cpts){
-			var link = new Link(from.ID, to.ID, new ArrayList<>(cpts));
+			var link = newLink(from.ID, to.ID, new ArrayList<>(cpts));
 			from.links.add(link.ID);
 			to.links.add(link.ID);
 			return created(link);
@@ -343,7 +340,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 			meshes.forEach(meshRefill);
 			while(!elems.isEmpty()){ //IFF and while there are previously non-existing disjoint meshes
 				var el = elems.values().stream().findAny().get();
-				var mesh = new Mesh(); //TODO maybe track separately the created meshes?
+				var mesh = newMesh(); //TODO maybe track separately the created meshes?
 				mesh.addElemRaw(el);
 				meshRefill.accept(mesh);
 			}
@@ -448,6 +445,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 		}
 	}
 
+	protected Node newNode(@NonNull CPTId cpt){ return new Node(cpt); }
 	public class Node extends MeshElem {
 
 		protected final CPTId cpt;
@@ -477,6 +475,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 
 	}
 
+	protected Link newLink(@NonNull MeshElemId from, @NonNull MeshElemId to, @NonNull List<CPTId> cpts){ return new Link(from, to, cpts); }
 	public class Link extends MeshElem {
 
 		@NonNull protected final MeshElemId from;
