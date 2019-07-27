@@ -305,12 +305,13 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 		 * <br>
 		 * <b>⚠ WARNING: </b>Once <code>apply</code> is invoked on the lowest order change set, there is no going back - <b>every higher-order change set must be applied</b>, until reaching the Δ-descriptor (highest-order change set describing all the changes, but with none left to apply), and <b>BEFORE</b> beginning next application of any other change set (even if disjoint).
 		 * Doing otherwise will throw the entire {@linkplain PhysicalMesher mesher} in limbo, where it does not have to obey any API definitions (including nullability) and is equivalent to driving the entire engine into UB state.
-		 * @param mic
-		 * @return
+		 * @param mic potentially affected meshes (all meshes can be dumped, it is however recommended to pre-filter to a narrower set of meshes for significant performance benefits)
+		 * @return basic change set
 		 */
 		@NonNull
 		public ChangeSetBasic apply(@NonNull Stream<Mesh> mic){
 			var changes = accChanges().collect(Collectors.toList());
+			//TODO this is rather inefficient way of filtering affected meshes, especially if all existing are dumped. However, it also computes `elem2meshBefore` at the same time. Consider whether optimizations are necessary.
 			var μeshes = mic.collect(Collectors.toSet()); //meshes but can include completely unaffected
 			var elem2meshBefore = changes.stream().map(ch -> ch.elem.ID).collect(Collectors.toMap(Function.identity(), id -> μeshes.stream().filter(m -> m.hasElem(id)).findAny())); //before
 			var meshes = elem2meshBefore.values().stream().flatMap(Optional::stream).collect(Collectors.toSet()); //μeshes but filtered to affected
