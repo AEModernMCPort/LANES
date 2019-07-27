@@ -257,7 +257,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 
 		protected boolean simplify(@NonNull Node node){
 			if(node.links.size() != 2) return false;
-			//TODO PDI check
+			if(!node.canBeSimplified()) return false;
 			var links = node.links.stream().map(this::<Link>getElem).collect(Collectors.toList());
 			var l1 = links.get(0);
 			var l2 = links.get(1);
@@ -471,6 +471,15 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 
 		protected void removeLinkRaw(@NonNull MeshElemId link){
 			links.remove(link);
+		}
+
+		/**
+		 * Checks whether this node can be simplified.<br>
+		 * Note: having exactly 2 links is a hard requirement (which is hardcoded externally), thus can be ignored here.
+		 * @return whether <code>this</code> node can be simplified, ignoring 2 links requirement
+		 */
+		public boolean canBeSimplified(){
+			return true;
 		}
 
 	}
