@@ -4,6 +4,7 @@ import lanes.ConnectParam;
 import lanes.Layer;
 import lanes.lan.CPTId;
 import lanes.lan.ConnectPassthrough;
+import lanes.lan.PhysicalListener;
 import lanes.lan.PhysicalPreprocessor;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -14,7 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>> implements PhysicalPreprocessor<CP, L>  {
+public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>, M extends Meshable> implements PhysicalPreprocessor<CP, L>, PhysicalListener<M> {
 
 	private final L layer;
 
@@ -27,6 +28,32 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>>
 	public L getLayer(){
 		return layer;
 	}
+
+	//Listener
+
+	@Override
+	public void onCreated(@NonNull M m){
+		//TODO
+	}
+
+	@Override
+	public void onDestroyed(@NonNull M m){
+		//TODO
+	}
+
+	@Override
+	public void onLoaded(@NonNull M m){
+		//TODO
+	}
+
+	@Override
+	public void onUnloaded(@NonNull M m){
+		//TODO
+	}
+
+	//Pre-processor
+
+	//Meshing
 
 	protected final Map<MeshId, Mesh> meshes = new HashMap<>();
 
