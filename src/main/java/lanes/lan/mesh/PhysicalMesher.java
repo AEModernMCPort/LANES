@@ -33,22 +33,34 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 	@Override
 	public void onCreated(@NonNull M m){
-		//TODO
+		if(m instanceof ConnectPassthrough) onCPTCreated((ConnectPassthrough) m);
+		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}
 
 	@Override
 	public void onDestroyed(@NonNull M m){
-		//TODO
+		if(m instanceof ConnectPassthrough) onCPTDestroyed((ConnectPassthrough) m);
+		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}
 
 	@Override
 	public void onLoaded(@NonNull M m){
-		//TODO
+		throw new UnsupportedOperationException("Load state handling not yet implemented");
 	}
 
 	@Override
 	public void onUnloaded(@NonNull M m){
-		//TODO
+		throw new UnsupportedOperationException("Load state handling not yet implemented");
+	}
+
+	//CPT
+
+	protected void onCPTCreated(@NonNull ConnectPassthrough cpt){
+
+	}
+
+	protected void onCPTDestroyed(@NonNull ConnectPassthrough cpt){
+
 	}
 
 	//Pre-processor
