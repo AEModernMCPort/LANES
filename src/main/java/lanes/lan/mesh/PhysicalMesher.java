@@ -307,9 +307,10 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		//MO-e
 
-		protected boolean simplify(@NonNull Node node){
-			if(node.links.size() != 2) return false;
-			if(!node.canBeSimplified()) return false;
+		@Nullable
+		protected Link simplify(@NonNull Node node){
+			if(node.links.size() != 2) return null;
+			if(!node.canBeSimplified()) return null;
 			var links = node.links.stream().map(this::<Link>getElem).collect(Collectors.toList());
 			var l1 = links.get(0);
 			var l2 = links.get(1);
@@ -327,8 +328,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 				cpts = Stream.concat(cpts, lc.stream());
 			} else cpts = Stream.concat(cpts, l2.getCPTs());
 			destroyNode(node);
-			createLink(from, to, cpts.collect(Collectors.toList()));
-			return true;
+			return createLink(from, to, cpts.collect(Collectors.toList()));
 		}
 
 		protected boolean desimplify(@NonNull Link link, @NonNull CPTId cpt){
