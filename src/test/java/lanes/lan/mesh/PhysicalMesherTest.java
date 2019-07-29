@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -86,17 +87,17 @@ public class PhysicalMesherTest {
 			aNode1.addLinkRaw(aLink2.ID);
 			aNode2.addLinkRaw(aLink2.ID);
 			//adj
-			assertEquals(Stream.of(aLink1.ID, aLink2.ID).collect(Collectors.toSet()), aNode1.adjacent().collect(Collectors.toSet()));
-			assertEquals(Stream.of(aLink1.ID, aLink2.ID).collect(Collectors.toSet()), aNode2.adjacent().collect(Collectors.toSet()));
-			assertEquals(Stream.of(aNode1.ID, aNode2.ID).collect(Collectors.toSet()), aLink1.adjacent().collect(Collectors.toSet()));
-			assertEquals(Stream.of(aNode1.ID, aNode2.ID).collect(Collectors.toSet()), aLink2.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aLink1.ID, aLink2.ID), aNode1.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aLink1.ID, aLink2.ID), aNode2.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aNode1.ID, aNode2.ID), aLink1.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aNode1.ID, aNode2.ID), aLink2.adjacent().collect(Collectors.toSet()));
 			aNode1.removeLinkRaw(aLink2.ID);
 			aNode2.removeLinkRaw(aLink2.ID);
-			assertEquals(Stream.of(aLink1.ID).collect(Collectors.toSet()), aNode1.adjacent().collect(Collectors.toSet()));
-			assertEquals(Stream.of(aLink1.ID).collect(Collectors.toSet()), aNode2.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aLink1.ID), aNode1.adjacent().collect(Collectors.toSet()));
+			assertEquals(Set.of(aLink1.ID), aNode2.adjacent().collect(Collectors.toSet()));
 			//CPTs
-			assertEquals(Stream.of(aId1).collect(Collectors.toSet()), aNode1.getCPTs().collect(Collectors.toSet()));
-			assertEquals(Stream.of(aId2).collect(Collectors.toSet()), aNode2.getCPTs().collect(Collectors.toSet()));
+			assertEquals(Set.of(aId1), aNode1.getCPTs().collect(Collectors.toSet()));
+			assertEquals(Set.of(aId2), aNode2.getCPTs().collect(Collectors.toSet()));
 			assertEquals(new HashSet<>(aIds1), aLink1.getCPTs().collect(Collectors.toSet()));
 			assertEquals(new HashSet<>(aIds2), aLink2.getCPTs().collect(Collectors.toSet()));
 		}
