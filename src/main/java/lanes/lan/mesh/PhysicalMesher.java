@@ -548,7 +548,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		public Link(@NonNull MeshElemId from, @NonNull MeshElemId to, @NonNull List<CPTId> cpts){
 			this.from = from;
 			this.to = to;
-			this.cpts = cpts;
+			this.cpts = List.copyOf(cpts);
 		}
 
 		@Override
