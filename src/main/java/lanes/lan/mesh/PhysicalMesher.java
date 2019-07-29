@@ -300,7 +300,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected void destroyLink(@NonNull MeshElemId link){ destroyLink(getElem(link)); }
 
 		protected void destroyNode(@NonNull Node node){
-			node.links.stream().map(this::<Link>getElem).forEach(this::destroyLink);
+			new ArrayList<>(node.links).stream().map(this::<Link>getElem).forEach(this::destroyLink);
 			destroyed(node);
 		}
 		protected void destroyNode(@NonNull MeshElemId node){ destroyNode(getElem(node)); }
