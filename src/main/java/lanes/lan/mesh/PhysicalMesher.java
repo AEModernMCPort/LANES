@@ -280,8 +280,8 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		@NonNull
 		protected Link createLink(@NonNull Node from, @NonNull Node to, List<CPTId> cpts){
 			var link = newLink(from.ID, to.ID, new ArrayList<>(cpts));
-			from.links.add(link.ID);
-			to.links.add(link.ID);
+			from.addLinkRaw(link.ID);
+			to.addLinkRaw(link.ID);
 			return created(link);
 		}
 		@NonNull protected Link createLink(@NonNull MeshElemId from, @NonNull MeshElemId to, List<CPTId> cpts){ return createLink(this.getElem(from), this.getElem(to), cpts); }
@@ -293,8 +293,8 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		protected void destroyLink(@NonNull Link link){
-			this.<Node>getElem(link.from).links.remove(link.ID);
-			this.<Node>getElem(link.to).links.remove(link.ID);
+			this.<Node>getElem(link.from).removeLinkRaw(link.ID);
+			this.<Node>getElem(link.to).removeLinkRaw(link.ID);
 			destroyed(link);
 		}
 		protected void destroyLink(@NonNull MeshElemId link){ destroyLink(getElem(link)); }
