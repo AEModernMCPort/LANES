@@ -340,6 +340,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			var n3 = link.to;
 			var l1 = createLink(n1, n2.ID, link.cpts.subList(0, index));
 			var l3 = createLink(n2.ID, n3, link.cpts.subList(index+1, link.cpts.size()));
+			destroyLink(link);
 			return new DesimplificationResult(l1, n2, l3);
 		}
 
