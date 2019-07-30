@@ -331,15 +331,35 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			return createLink(from, to, cpts.collect(Collectors.toList()));
 		}
 
-		protected boolean desimplify(@NonNull Link link, @NonNull CPTId cpt){
+		@Nullable
+		protected DesimplificationResult desimplify(@NonNull Link link, @NonNull CPTId cpt){
 			var index = link.cpts.indexOf(cpt);
-			if(index < 0 || link.cpts.size() <= index) return false;
+			if(index < 0 || link.cpts.size() <= index) return null;
 			var n1 = link.from;
 			var n2 = createNode(cpt);
 			var n3 = link.to;
-			createLink(n1, n2.ID, link.cpts.subList(0, index));
-			createLink(n2.ID, n3, link.cpts.subList(index+1, link.cpts.size()));
-			return true;
+			var l1 = createLink(n1, n2.ID, link.cpts.subList(0, index));
+			var l3 = createLink(n2.ID, n3, link.cpts.subList(index+1, link.cpts.size()));
+			return new DesimplificationResult(l1, n2, l3);
+		}
+
+		public class DesimplificationResult {
+
+			/*
+			 * [a]≣cpts-c-stpc≣[b] ➡ [a]≣cpts≣[c]≣stpc≣[b]
+			 * ⇔
+			 * [?]≣l≣[?] ➡ [?]≣l1≣[n2]≣l3≣[?]
+			 */
+			public final Link l1;
+			public final Node n2;
+			public final Link l3;
+
+			public DesimplificationResult(@NonNull Link l1, @NonNull Node n2, @NonNull Link l3){
+				this.l1 = l1;
+				this.n2 = n2;
+				this.l3 = l3;
+			}
+
 		}
 
 		//Apply
