@@ -435,7 +435,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			var cptChanges = changes.stream().flatMap(change -> change.elem.getCPTs().map(cpt -> new CPTChange(cpt, change.destroyed() ? change.elem : null, change.created() ? change.elem : null, elem2meshBefore.get(change.elem.ID).orElse(null), elem2meshAfter.get(change.elem).orElse(null)))).collect(Collectors.groupingBy(c -> c.cpt, LinkedHashMap::new, Collectors.reducing(CPTChange::then))).values().stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 			List<Mesh> mA = new ArrayList<>(), mD = new ArrayList<>(), mC = new ArrayList<>();
 			ffElems.forEach((m, es) -> {
-				boolean c = meshes.contains(m), d = es.isEmpty();
+				boolean c = !meshes.contains(m), d = es.isEmpty();
 				if(!(c && d)) (d ? mD : c ? mC : mA).add(m);
 			});
 			return newChangeSetBasic(cptChanges, mA, mD, mC);
