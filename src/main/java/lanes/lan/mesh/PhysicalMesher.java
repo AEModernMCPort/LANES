@@ -406,8 +406,9 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 						e.adjacent().map(elems::remove).forEach(q::offer);
 					}
 				};
-				while(!q.isEmpty()) nom.accept(q.poll());
+				elems.remove(selem.get().ID);
 				nom.accept(selem.get());
+				while(!q.isEmpty()) nom.accept(q.poll());
 				ffElems.put(mesh, proc);
 				//TODO This is complicated and must be thoroughly tested!
 			};
