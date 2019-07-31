@@ -476,9 +476,13 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		protected MeshElemChange then(@NonNull MeshElemChange change){
+			return change.thenThis(this);
+		}
+
+		protected MeshElemChange thenThis(@NonNull MeshElemChange change){
 			if(change.elem != elem) throw new IllegalArgumentException("Changes accumulate only over the same element!");
-			if(change.prevState != newState) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
-			return new MeshElemChange(elem, prevState, change.newState);
+			if(change.newState != prevState) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
+			return new MeshElemChange(elem, change.prevState, newState);
 		}
 
 		//Fac
