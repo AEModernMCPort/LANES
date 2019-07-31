@@ -425,14 +425,14 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			 * So, at this point, we're only interested in in `elem2meshBefore`, `elem2meshAfter` and `ffElems`.
 			 *
 			 * Any change of mesh of an element can be observed with `elem2meshBefore` and `elem2meshAfter`, respectively before and after, with these special cases:
-			 * 	empty -> a mesh	:	created
-			 * 	a mesh -> empty :	destroyed
+			 * 	empty -> a mesh			:	created
+			 * 	a mesh -> absent/empty	:	destroyed
 			 *
 			 * `ffElems` provides information about mesh changes, more precisely elements contained in the mesh after the change. Special cases:
 			 * 	an empty set indicates the mesh no longer exists (all elements have been destroyed and/or distributed to other mesh(es))
 			 * 	if the mesh is not contained in `meshes`, it has been created. (as per the to-do, we may want to track them in an additional collection)
 			 */
-			var cptChanges = changes.stream().flatMap(change -> change.elem.getCPTs().map(cpt -> new CPTChange(cpt, change.destroyed() ? change.elem : null, change.created() ? change.elem : null, elem2meshBefore.get(change.elem.ID).orElse(null), elem2meshAfter.get(change.elem).orElse(null)))).collect(Collectors.groupingBy(c -> c.cpt, LinkedHashMap::new, Collectors.reducing(CPTChange::then))).values().stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
+			var cptChanges = changes.stream().flatMap(change -> change.elem.getCPTs().map(cpt -> new CPTChange(cpt, change.destroyed() ? change.elem : null, change.created() ? change.elem : null, elem2meshBefore.get(change.elem.ID).orElse(null), Optional.ofNullable(elem2meshAfter.get(change.elem)).flatMap(Function.identity()).orElse(null)))).collect(Collectors.groupingBy(c -> c.cpt, LinkedHashMap::new, Collectors.reducing(CPTChange::then))).values().stream().filter(Optional::isPresent).map(Optional::get).collect(Collectors.toList());
 			List<Mesh> mA = new ArrayList<>(), mD = new ArrayList<>(), mC = new ArrayList<>();
 			ffElems.forEach((m, es) -> {
 				boolean c = !meshes.contains(m), d = es.isEmpty();
