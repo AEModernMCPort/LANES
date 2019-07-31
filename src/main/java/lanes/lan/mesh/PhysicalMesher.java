@@ -389,7 +389,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			var elem2meshBefore = changes.stream().map(ch -> ch.elem.ID).collect(Collectors.toMap(Function.identity(), id -> μeshes.stream().filter(m -> m.hasElem(id)).findAny())); //before
 			var meshes = elem2meshBefore.values().stream().flatMap(Optional::stream).collect(Collectors.toSet()); //μeshes but filtered to affected
 
-			var elems = changes.stream().map(e -> e.elem).collect(Collectors.toMap(e -> e.ID, Function.identity()));
+			var elems = changes.stream().filter(c -> c.newState).map(e -> e.elem).collect(Collectors.toMap(e -> e.ID, Function.identity()));
 			var ffElems = new HashMap<Mesh, Set<MeshElem>>();
 			Consumer<Mesh> meshRefill = mesh -> {
 				if(mesh.elements.isEmpty()) return;
@@ -406,8 +406,8 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 						e.adjacent().map(elems::remove).forEach(q::offer);
 					}
 				};
-				nom.accept(mesh.elements.values().stream().findAny().get());
 				while(!q.isEmpty()) nom.accept(q.poll());
+				nom.accept(selem.get());
 				ffElems.put(mesh, proc);
 				//TODO This is complicated and must be thoroughly tested!
 			};
