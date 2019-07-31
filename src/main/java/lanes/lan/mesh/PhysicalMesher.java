@@ -165,7 +165,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected void apply(@NonNull Function<CPTId, ConnectPassthrough> ptSupplier){
 			destroyed.forEach(PhysicalMesher.this::removeMeshRaw);
 			created.forEach(PhysicalMesher.this::addMeshRaw);
-			cptChanges.forEach(Δ -> ptSupplier.apply(Δ.cpt).setGMLoc(new GlobalMeshLoc(Δ.newMesh.ID, Δ.newElem.ID)));
+			cptChanges.stream().filter(CPTChange::exists).forEach(Δ -> ptSupplier.apply(Δ.cpt).setGMLoc(new GlobalMeshLoc(Δ.newMesh.ID, Δ.newElem.ID)));
 			//TODO Return next order change set
 		}
 	}
