@@ -225,6 +225,9 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		public boolean cptDestroyed(){
 			return newElem == null && newMesh == null;
 		}
+		public boolean exists(){
+			return !cptDestroyed();
+		}
 
 		public boolean changed(){
 			return elementChanged() || meshChanged();
