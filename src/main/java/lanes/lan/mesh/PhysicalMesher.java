@@ -275,6 +275,10 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			return e;
 		}
 
+		private void trackLinkChanges(@NonNull Node node, Set<MeshElemId> before){
+			changes.add(new MeshElemChange(node, true, new MeshElemInnerChange("links", before, Set.copyOf(node.links))));
+		}
+
 		@NonNull
 		protected Node createNode(@NonNull CPTId cpt){
 			return created(newNode(cpt));
@@ -283,8 +287,8 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		@NonNull
 		protected Link createLink(@NonNull Node from, @NonNull Node to, List<CPTId> cpts){
 			var link = newLink(from.ID, to.ID, new ArrayList<>(cpts));
-			from.addLinkRaw(link.ID);
-			to.addLinkRaw(link.ID);
+			var fromLinksBefore = Set.copyOf(from.links); from.addLinkRaw(link.ID); trackLinkChanges(from, fromLinksBefore);
+			var toLinksBefore = Set.copyOf(to.links); to.addLinkRaw(link.ID); trackLinkChanges(to, toLinksBefore);
 			return created(link);
 		}
 		@NonNull protected Link createLink(@NonNull MeshElemId from, @NonNull MeshElemId to, List<CPTId> cpts){ return createLink(this.getElem(from), this.getElem(to), cpts); }
@@ -296,8 +300,9 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		protected void destroyLink(@NonNull Link link){
-			this.<Node>getElem(link.from).removeLinkRaw(link.ID);
-			this.<Node>getElem(link.to).removeLinkRaw(link.ID);
+			Node from = getElem(link.from), to = getElem(link.to);
+			var fromLinksBefore = Set.copyOf(from.links); from.removeLinkRaw(link.ID);  trackLinkChanges(from, fromLinksBefore);
+			var toLinksBefore = Set.copyOf(to.links); to.removeLinkRaw(link.ID);  trackLinkChanges(to, toLinksBefore);
 			destroyed(link);
 		}
 		protected void destroyLink(@NonNull MeshElemId link){ destroyLink(getElem(link)); }
