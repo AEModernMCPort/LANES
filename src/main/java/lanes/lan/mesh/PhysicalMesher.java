@@ -455,15 +455,29 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		public final MeshElem elem;
 		public final boolean prevState;
 		public final boolean newState;
+		public final Map<String, MeshElemInnerChange> innerChanges;
 
-		protected MeshElemChange(@NonNull MeshElem elem, boolean prevState, boolean newState){
+		protected MeshElemChange(@NonNull MeshElem elem, boolean prevState, boolean newState, @NonNull Map<String, MeshElemInnerChange> innerChanges){
 			this.elem = elem;
 			this.prevState = prevState;
 			this.newState = newState;
+			this.innerChanges = Map.copyOf(innerChanges);
+		}
+
+		protected MeshElemChange(@NonNull MeshElem elem, boolean prevState, boolean newState){
+			this(elem, prevState, newState, new HashMap<>());
+		}
+
+		protected MeshElemChange(@NonNull MeshElem elem, boolean state, @NonNull Map<String, MeshElemInnerChange> innerChanges){
+			this(elem, state, state, innerChanges);
+		}
+
+		protected MeshElemChange(@NonNull MeshElem elem, boolean state, @NonNull MeshElemInnerChange innerChange){
+			this(elem, state, Map.of(innerChange.prop, innerChange));
 		}
 
 		protected MeshElemChange(@NonNull MeshElem elem, boolean state){
-			this(elem, state, state);
+			this(elem, state, new HashMap<>());
 		}
 
 		//Acc
@@ -478,13 +492,13 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected MeshElemChange then(@NonNull MeshElemChange change){
 			if(change.elem != elem) throw new IllegalArgumentException("Changes accumulate only over the same element!");
 			if(change.prevState != newState) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
-			return new MeshElemChange(elem, prevState, change.newState);
+			return new MeshElemChange(elem, prevState, change.newState, innerChanges.values().stream().map(ic -> Optional.ofNullable(change.innerChanges.get(ic.prop)).map(ic::then).orElse(ic)).collect(Collectors.toMap(ic -> ic.prop, Function.identity())));
 		}
 
 		//Fac
 
 		public boolean changed(){
-			return newState != prevState;
+			return newState != prevState || !innerChanges.isEmpty();
 		}
 
 		public boolean created(){
@@ -492,6 +506,29 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 		public boolean destroyed(){
 			return prevState && !newState;
+		}
+
+	}
+
+	protected class MeshElemInnerChange<T> {
+
+		protected final String prop;
+		protected final T prevVal, newVal;
+
+		public MeshElemInnerChange(@NonNull String prop, @Nullable T prevVal, @Nullable T newVal){
+			this.prop = prop;
+			this.prevVal = prevVal;
+			this.newVal = newVal;
+		}
+
+		protected MeshElemInnerChange<T> then(@NonNull MeshElemInnerChange<T> change){
+			if(!change.prop.equals(prop)) throw new IllegalArgumentException("Changes accumulate only over the same property!");
+			if(!Objects.equals(prevVal, change.newVal)) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
+			return new MeshElemInnerChange<>(prop, prevVal, change.newVal);
+		}
+
+		public boolean changed(){
+			return !Objects.equals(prevVal, newVal);
 		}
 
 	}
