@@ -438,6 +438,10 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 				boolean c = !meshes.contains(m), d = es.isEmpty();
 				if(!(c && d)) (d ? mD : c ? mC : mA).add(m);
 			});
+			mA.forEach(mesh -> {
+				mesh.elements.clear();
+				ffElems.get(mesh).forEach(mesh::addElemRaw);
+			});
 			return newChangeSetBasic(cptChanges, mA, mD, mC);
 		}
 
