@@ -340,6 +340,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			var l2 = links.get(1);
 			var from = this.<Node>getElem(l1.getOtherEnd(node.ID));
 			var to = this.<Node>getElem(l2.getOtherEnd(node.ID));
+			if(from == to) return null;
 			var medium = node.medium;
 			if(medium != from.medium || medium != to.medium) return null;
 			if(!node.canBeSimplified()) return null;
