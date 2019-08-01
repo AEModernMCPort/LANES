@@ -690,6 +690,11 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			return Stream.of(from, to);
 		}
 
+		@NonNull
+		public MeshElemId getOtherEnd(@NonNull MeshElemId aEnd){
+			return aEnd.equals(from) ? to : from;
+		}
+
 		@Override
 		protected boolean isValid(Mesh mesh){
 			return super.isValid(mesh) && mesh.<Node>getPresentElem(from).links.contains(ID) && mesh.<Node>getPresentElem(to).links.contains(ID);
