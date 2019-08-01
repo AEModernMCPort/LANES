@@ -2,6 +2,8 @@ package lanes.lan.mesh;
 
 import lanes.ConnectParam;
 import lanes.Layer;
+import lanes.TestTortoise;
+import lanes.Validatable;
 import lanes.lan.CPTId;
 import lanes.lan.ConnectPassthrough;
 import lanes.lan.PhysicalListener;
@@ -15,7 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>, M extends Meshable> implements PhysicalPreprocessor<CP, L>, PhysicalListener<M> {
+public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>, M extends Meshable> implements PhysicalPreprocessor<CP, L>, PhysicalListener<M>, Validatable {
 
 	private final L layer;
 
@@ -65,6 +67,13 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 	//Pre-processor
 
+	//Test 🐢
+
+	@Override
+	public boolean isValid(){
+		return meshes.values().stream().allMatch(Mesh::isValid);
+	}
+
 	//Meshing
 
 	protected final Map<MeshId, Mesh> meshes = new HashMap<>();
@@ -80,7 +89,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 	protected void removeMeshRaw(@NonNull Mesh mesh){ removeMeshRaw(mesh.ID); }
 
 	protected Mesh newMesh(){ return new Mesh(); }
-	public class Mesh {
+	public class Mesh implements Validatable {
 
 		public final MeshId ID;
 
@@ -105,6 +114,11 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		protected void removeElemRaw(@NonNull MeshElemId elem){ elements.remove(elem); }
 		protected void removeElemRaw(@NonNull MeshElem elem){ removeElemRaw(elem.ID); }
+
+		@Override
+		public boolean isValid(){
+			return !elements.isEmpty() && elements.values().stream().allMatch(e -> e.isValid(this));
+		}
 
 		@Override
 		public boolean equals(Object o){
@@ -590,6 +604,11 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		@NonNull
 		protected abstract Stream<MeshElemId> adjacent();
 
+		@TestTortoise
+		protected boolean isValid(Mesh mesh){
+			return adjacent().allMatch(mesh::hasElem);
+		}
+
 		@Override
 		public boolean equals(Object o){
 			if(this == o) return true;
@@ -641,6 +660,11 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			return true;
 		}
 
+		@Override
+		protected boolean isValid(Mesh mesh){
+			return super.isValid(mesh) && links.stream().map(mesh::<Link>getPresentElem).allMatch(l -> l.from.equals(ID) || l.to.equals(ID));
+		}
+
 	}
 
 	protected Link newLink(@NonNull MeshElemId from, @NonNull MeshElemId to, @NonNull List<CPTId> cpts){ return new Link(from, to, cpts); }
@@ -665,6 +689,12 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected @NonNull Stream<MeshElemId> adjacent(){
 			return Stream.of(from, to);
 		}
+
+		@Override
+		protected boolean isValid(Mesh mesh){
+			return super.isValid(mesh) && mesh.<Node>getPresentElem(from).links.contains(ID) && mesh.<Node>getPresentElem(to).links.contains(ID);
+		}
+
 	}
 
 }
