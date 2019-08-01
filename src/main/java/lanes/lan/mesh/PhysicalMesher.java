@@ -630,7 +630,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		protected final Set<MeshElemId> links = new HashSet<>();
 
-		public Node(@NonNull CPTId cpt){
+		protected Node(@NonNull CPTId cpt){
 			this.cpt = cpt;
 		}
 
@@ -675,7 +675,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		protected final List<CPTId> cpts;
 
-		public Link(@NonNull MeshElemId from, @NonNull MeshElemId to, @NonNull List<CPTId> cpts){
+		protected Link(@NonNull MeshElemId from, @NonNull MeshElemId to, @NonNull List<CPTId> cpts){
 			this.from = from;
 			this.to = to;
 			this.cpts = List.copyOf(cpts);
