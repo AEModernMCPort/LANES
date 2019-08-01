@@ -4,10 +4,7 @@ import lanes.ConnectParam;
 import lanes.Layer;
 import lanes.TestTortoise;
 import lanes.Validatable;
-import lanes.lan.CPTId;
-import lanes.lan.ConnectPassthrough;
-import lanes.lan.PhysicalListener;
-import lanes.lan.PhysicalPreprocessor;
+import lanes.lan.*;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -290,8 +287,8 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		@NonNull
-		protected Node createNode(@NonNull CPTId cpt){
-			return created(newNode(cpt));
+		protected Node createNode(@NonNull CPTId cpt, @NonNull Medium medium){
+			return created(newNode(cpt, medium));
 		}
 
 		protected void nodeAddLink(@NonNull Node node, @NonNull Link link){
@@ -338,12 +335,14 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		@Nullable
 		protected Link simplify(@NonNull Node node){
 			if(node.links.size() != 2) return null;
-			if(!node.canBeSimplified()) return null;
 			var links = node.links.stream().map(this::<Link>getElem).collect(Collectors.toList());
 			var l1 = links.get(0);
 			var l2 = links.get(1);
-			var from = l1.from == node.ID ? l1.to : l1.from;
-			var to = l2.from == node.ID ? l2.to : l2.from;
+			var from = this.<Node>getElem(l1.getOtherEnd(node.ID));
+			var to = this.<Node>getElem(l2.getOtherEnd(node.ID));
+			var medium = node.medium;
+			if(medium != from.medium || medium != to.medium) return null;
+			if(!node.canBeSimplified()) return null;
 			var cpts = node.getCPTs();
 			if(l1.from == node.ID){
 				var lc = new ArrayList<>(l1.cpts);
@@ -363,11 +362,13 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected DesimplificationResult desimplify(@NonNull Link link, @NonNull CPTId cpt){
 			var index = link.cpts.indexOf(cpt);
 			if(index < 0 || link.cpts.size() <= index) return null;
-			var n1 = link.from;
-			var n2 = createNode(cpt);
-			var n3 = link.to;
-			var l1 = createLink(n1, n2.ID, link.cpts.subList(0, index));
-			var l3 = createLink(n2.ID, n3, link.cpts.subList(index+1, link.cpts.size()));
+			var n1 = this.<Node>getElem(link.from);
+			var n3 = this.<Node>getElem(link.to);
+			if(n1.medium != n3.medium) return null;
+			var medium = n1.medium;
+			var n2 = createNode(cpt, medium);
+			var l1 = createLink(n1, n2, link.cpts.subList(0, index));
+			var l3 = createLink(n2, n3, link.cpts.subList(index+1, link.cpts.size()));
 			destroyLink(link);
 			return new DesimplificationResult(l1, n2, l3);
 		}
@@ -623,15 +624,17 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 	}
 
-	protected Node newNode(@NonNull CPTId cpt){ return new Node(cpt); }
+	protected Node newNode(@NonNull CPTId cpt, @NonNull Medium medium){ return new Node(cpt, medium); }
 	public class Node extends MeshElem {
 
 		protected final CPTId cpt;
+		protected final Medium medium;
 
 		protected final Set<MeshElemId> links = new HashSet<>();
 
-		protected Node(@NonNull CPTId cpt){
+		public Node(@NonNull CPTId cpt, @NonNull Medium medium){
 			this.cpt = cpt;
+			this.medium = medium;
 		}
 
 		@Override
