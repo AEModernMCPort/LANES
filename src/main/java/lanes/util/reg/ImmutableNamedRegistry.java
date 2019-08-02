@@ -20,6 +20,10 @@ public class ImmutableNamedRegistry<T extends NamedRegistry.Entry<T>> implements
 		this.reg = entries.collect(Collectors.toUnmodifiableMap(NamedRegistry.Entry::getName, Function.identity()));
 	}
 
+	public ImmutableNamedRegistry(@NonNull NamedRegistry<T> reg){
+		this(reg.entries());
+	}
+
 	@Override
 	public boolean has(@NonNull String name){
 		return reg.containsKey(name);
