@@ -1,5 +1,6 @@
 package lanes.lan.mesh;
 
+import lanes.Layer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 /**
@@ -8,6 +9,6 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  */
 public interface Meshable {
 
-	boolean existsIn(@NonNull String layer);
+	boolean existsIn(@NonNull Layer layer);
 
 }
