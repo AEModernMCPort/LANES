@@ -32,12 +32,14 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 	@Override
 	public void onCreated(@NonNull M m){
+		if(!m.existsIn(layer)) return;
 		if(m instanceof CPTHub) onCPTCreated((CPTHub) m);
 		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}
 
 	@Override
 	public void onDestroyed(@NonNull M m){
+		if(!m.existsIn(layer)) return;
 		if(m instanceof CPTHub) onCPTDestroyed((CPTHub) m);
 		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}
