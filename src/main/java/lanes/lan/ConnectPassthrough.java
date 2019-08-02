@@ -32,7 +32,6 @@ public interface ConnectPassthrough extends Meshable {
 	 * The length of this cpt
 	 * @return length of this cpt
 	 */
-	@NonNull
 	double selfLength(); //TODO Layer specific..?
 
 	/**
