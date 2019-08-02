@@ -8,7 +8,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Optional;
 
-public interface ConnectPassthrough extends Meshable {
+public interface ConnectPassthrough {
 
 	@NonNull
 	CPTId getId();
@@ -43,11 +43,6 @@ public interface ConnectPassthrough extends Meshable {
 	 */
 	@NonNull
 	<CP extends ConnectParam<CP>> Optional<CP> passthroughLimit(@NonNull String layer);
-
-	@Override
-	default boolean existsIn(@NonNull String layer){
-		return passthroughLimit(layer).isPresent();
-	}
 
 	/*
 	 * Sim-Internal
