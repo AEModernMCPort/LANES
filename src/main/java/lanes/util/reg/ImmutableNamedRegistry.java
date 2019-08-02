@@ -20,9 +20,8 @@ public class ImmutableNamedRegistry<T extends NamedRegistry.Entry<T>> implements
 		this.reg = entries.collect(Collectors.toUnmodifiableMap(NamedRegistry.Entry::getName, Function.identity()));
 	}
 
-	public ImmutableNamedRegistry(@NonNull NamedRegistry<T> reg){
-		this(reg.entries());
-	}
+	protected ImmutableNamedRegistry(@NonNull NamedRegistry<T> reg){ this(reg.entries()); }
+	@NonNull public static <T extends NamedRegistry.Entry<T>> ImmutableNamedRegistry<T> copyOf(@NonNull NamedRegistry<T> reg){ return reg instanceof ImmutableNamedRegistry ? (ImmutableNamedRegistry<T>) reg : new ImmutableNamedRegistry<T>(reg); }
 
 	@Override
 	public boolean has(@NonNull String name){
