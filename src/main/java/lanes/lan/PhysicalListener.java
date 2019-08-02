@@ -1,5 +1,6 @@
 package lanes.lan;
 
+import lanes.LListener;
 import lanes.lan.mesh.Meshable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
@@ -8,7 +9,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
  *
  * @param <M> the implementation-specific common meshable type
  */
-public interface PhysicalListener<M extends Meshable> {
+public interface PhysicalListener<M extends Meshable> extends LListener {
 
 	void onCreated(@NonNull M m);
 	void onDestroyed(@NonNull M m);
