@@ -1,11 +1,12 @@
 package lanes.lan;
 
+import lanes.lan.mesh.Meshable;
 import org.checkerframework.checker.index.qual.NonNegative;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Optional;
 
-public interface CPTHub {
+public interface CPTHub extends Meshable {
 
 	/**
 	 * Retrieve the cpt in this hub for given medium, or {@linkplain Optional#empty() nothing} if the hub does not have any cpt.<br>
