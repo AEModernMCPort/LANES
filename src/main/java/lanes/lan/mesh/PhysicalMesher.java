@@ -16,15 +16,15 @@ import java.util.stream.Stream;
 
 public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>, M extends Meshable> implements PhysicalPreprocessor<CP, L>, PhysicalListener<M>, Validatable {
 
-	private final L layer;
+	private final L.Instance<M> layer;
 
-	public PhysicalMesher(L layer){
+	public PhysicalMesher(L.Instance<M> layer){
 		this.layer = layer;
 	}
 
 	@NonNull
 	@Override
-	public L getLayer(){
+	public L.Instance<?> getLayerInstance(){
 		return layer;
 	}
 
@@ -32,14 +32,14 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 	@Override
 	public void onCreated(@NonNull M m){
-		if(!m.existsIn(layer)) return;
+		if(!m.existsIn(getLayer())) return;
 		if(m instanceof CPTHub) onCPTCreated((CPTHub) m);
 		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}
 
 	@Override
 	public void onDestroyed(@NonNull M m){
-		if(!m.existsIn(layer)) return;
+		if(!m.existsIn(getLayer())) return;
 		if(m instanceof CPTHub) onCPTDestroyed((CPTHub) m);
 		else throw new IllegalArgumentException(String.format("Given Meshable type [%s] is not supported by this mesher", m.getClass().getName()));
 	}

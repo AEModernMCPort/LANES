@@ -29,7 +29,7 @@ public class PhysicalMesherTest {
 	@Nested
 	class TestWithoutMeshables {
 
-		PhysicalMesher<ConnectParamDoubleSample, LayerDoubleSample, Meshable> sampleMesher = new PhysicalMesher<>(sampleLayer);
+		PhysicalMesher<ConnectParamDoubleSample, LayerDoubleSample, Meshable> sampleMesher = sampleLayer.newInstance().setPhysicalMesher(PhysicalMesher::new).build().getPhysicalMesher();
 		Supplier<PhysicalMesher<ConnectParamDoubleSample, LayerDoubleSample, Meshable>.ChangeSetPrimitive> lazyNewChangeSet = () -> sampleMesher.newChangeSetPrimitive(id -> sampleMesher.meshes.values().stream().flatMap(mesh -> mesh.getElem(id).stream()).findAny().orElse(null));
 
 		@Test
