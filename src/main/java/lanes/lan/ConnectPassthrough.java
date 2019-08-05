@@ -3,7 +3,6 @@ package lanes.lan;
 import lanes.ConnectParam;
 import lanes.SimExt;
 import lanes.lan.mesh.GlobalMeshLoc;
-import lanes.lan.mesh.Meshable;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Optional;
