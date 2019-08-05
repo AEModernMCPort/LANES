@@ -14,6 +14,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * @param <CP> connect param & layer specific types
+ * @param <L> connect param & layer specific type
+ * @param <M> base {@linkplain Meshable meshable} [grouping] type
+ */
 public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>, M extends Meshable> implements PhysicalPreprocessor<CP, L>, PhysicalListener<M>, Validatable {
 
 	private final L.Instance<M> layer;
