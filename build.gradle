@@ -96,6 +96,7 @@ task generatePom {
 
 javadoc {
 	failOnError = false
+	options.encoding = 'UTF-8'
 	options.addBooleanOption('html5', true)
 }
 
