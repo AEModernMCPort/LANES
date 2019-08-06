@@ -11,6 +11,9 @@ cache:
     - "$HOME/.gradle/caches/"
     - "$HOME/.gradle/wrapper/"
 
+after_success:
+  - ./gradlew jacocoTestReport coveralls
+
 deploy:
   - provider: releases
     api_key:

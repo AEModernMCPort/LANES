@@ -2,6 +2,8 @@ plugins {
 	id 'java-library'
 	id 'maven'
 	id 'maven-publish'
+	id 'jacoco'
+	id 'com.github.kt3k.coveralls' version '2.8.4'
 	id "org.checkerframework" version "0.3.4"
 }
 
@@ -60,6 +62,17 @@ test {
 	testLogging {
 		events "passed", "skipped", "failed"
 	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled = true // coveralls plugin depends on xml format report
+		html.enabled = true
+	}
+}
+
+coveralls {
+	jacocoReportPath 'build/reports/jacoco/test/jacocoTestReport.xml'
 }
 
 task generatePom {
