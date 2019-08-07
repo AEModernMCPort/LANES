@@ -144,6 +144,51 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 	 * ⚠ Raw ⇒ Updates *Not* Propagated Beyond change level
 	 */
 
+	@NonNull public ΔResult newΔResult(@NonNull List<CPTChange> cptChanges, @NonNull List<MeshChange> meshChanges){ return new ΔResult(cptChanges, meshChanges); }
+	public class ΔResult {
+
+		protected final List<CPTChange> cptChanges;
+		protected final List<MeshChange> meshChanges;
+
+		public ΔResult(@NonNull List<CPTChange> cptChanges, @NonNull List<MeshChange> meshChanges){
+			this.cptChanges = cptChanges;
+			this.meshChanges = meshChanges;
+		}
+
+		@NonNull
+		public List<CPTChange> getCptChanges(){
+			return cptChanges;
+		}
+
+		@NonNull
+		public List<MeshChange> getMeshChanges(){
+			return meshChanges;
+		}
+
+	}
+	public class MeshChange implements Validatable {
+
+		public final Mesh mesh;
+		public final boolean prevState, newState;
+
+		protected MeshChange(@NonNull Mesh mesh, boolean prevState, boolean newState){
+			this.mesh = mesh;
+			this.prevState = prevState;
+			this.newState = newState;
+		}
+		protected MeshChange(@NonNull Mesh mesh, boolean newState){ this(mesh, !newState, newState); }
+		protected MeshChange(@NonNull Mesh mesh){ this(mesh, true, true); }
+
+		@Override
+		public boolean isValid(){ return prevState || newState; }
+		public boolean affected(){ return prevState && newState; }
+		public boolean created(){ return !prevState && newState; }
+		public boolean destroyed(){ return prevState && !newState; }
+
+	}
+
+
+
 	/*
 	 * Changes
 	 */
@@ -180,11 +225,12 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			this.created = created;
 		}
 
-		protected void apply(@NonNull Function<CPTId, ConnectPassthrough> ptSupplier){
+		@NonNull
+		protected ΔResult apply(@NonNull Function<CPTId, ConnectPassthrough> ptSupplier){
 			destroyed.forEach(PhysicalMesher.this::removeMeshRaw);
 			created.forEach(PhysicalMesher.this::addMeshRaw);
 			cptChanges.stream().filter(CPTChange::exists).forEach(Δ -> ptSupplier.apply(Δ.cpt).setGMLoc(new GlobalMeshLoc(Δ.newMesh.ID, Δ.newElem.ID)));
-			//TODO Return next order change set
+			return newΔResult(List.copyOf(cptChanges), Stream.concat(changed.stream().map(MeshChange::new), Stream.concat(destroyed.stream().map(m -> new MeshChange(m, false)), created.stream().map(m -> new MeshChange(m, true)))).collect(Collectors.toUnmodifiableList()));
 		}
 	}
 
