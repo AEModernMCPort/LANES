@@ -214,21 +214,26 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		//Accumulation
 
+		@NonNull
 		protected CPTChange change(@Nullable MeshElem newElem, @Nullable Mesh newMesh){
 			return new CPTChange(cpt, prevElem, newElem, prevMesh, newMesh);
 		}
 
+		@NonNull
 		protected CPTChange changeElem(@Nullable MeshElem newElem){
 			return change(newElem, newMesh);
 		}
+		@NonNull
 		protected CPTChange changeMesh(@Nullable Mesh newMesh){
 			return change(newElem, newMesh);
 		}
 
+		@NonNull
 		protected CPTChange destroy(){
 			return change(null, null);
 		}
 
+		@NonNull
 		protected CPTChange then(@NonNull CPTChange change){
 			if(change.cpt != cpt) throw new IllegalArgumentException("Changes accumulate only over the same element!");
 			if(change.prevElem != newElem || change.prevMesh != newMesh) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
@@ -287,6 +292,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		//LO-create
 
+		@NonNull
 		private <E extends MeshElem> E created(@NonNull E e){
 			changes.add(new MeshElemChange(e, false).create());
 			elementsCache.put(e.ID, e);
@@ -516,13 +522,16 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 
 		//Acc
 
+		@NonNull
 		protected MeshElemChange create(){
 			return new MeshElemChange(elem, prevState, true);
 		}
+		@NonNull
 		protected MeshElemChange destroy(){
 			return new MeshElemChange(elem, prevState, false);
 		}
 
+		@NonNull
 		protected MeshElemChange then(@NonNull MeshElemChange change){
 			if(change.elem != elem) throw new IllegalArgumentException("Changes accumulate only over the same element!");
 			if(change.prevState != newState) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
@@ -584,6 +593,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 			this(new PropertyComponent<>(prop, component), prevState, newState);
 		}
 
+		@NonNull
 		protected MeshElemInnerChange<T> then(@NonNull MeshElemInnerChange<T> change){
 			if(!change.propCo.equals(propCo)) throw new IllegalArgumentException("Changes accumulate only over the same property!");
 			if(change.prevState != newState) throw new IllegalArgumentException("Cannot accumulate non-consecutive changes!");
@@ -614,7 +624,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		protected abstract Stream<MeshElemId> adjacent();
 
 		@TestTortoise
-		protected boolean isValid(Mesh mesh){
+		protected boolean isValid(@NonNull Mesh mesh){
 			return adjacent().allMatch(mesh::hasElem);
 		}
 
@@ -672,7 +682,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		@Override
-		protected boolean isValid(Mesh mesh){
+		protected boolean isValid(@NonNull Mesh mesh){
 			return super.isValid(mesh) && links.stream().map(mesh::<Link>getPresentElem).allMatch(l -> l.from.equals(ID) || l.to.equals(ID));
 		}
 
@@ -707,7 +717,7 @@ public class PhysicalMesher<CP extends ConnectParam<CP>, L extends Layer<CP, L>,
 		}
 
 		@Override
-		protected boolean isValid(Mesh mesh){
+		protected boolean isValid(@NonNull Mesh mesh){
 			return super.isValid(mesh) && mesh.<Node>getPresentElem(from).links.contains(ID) && mesh.<Node>getPresentElem(to).links.contains(ID);
 		}
 
