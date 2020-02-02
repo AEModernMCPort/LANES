@@ -1,6 +1,5 @@
 plugins {
 	id 'java-library'
-	id 'maven'
 	id 'maven-publish'
 	id 'jacoco'
 	id 'com.github.kt3k.coveralls' version '2.8.4'
@@ -31,11 +30,11 @@ sourceSets {
 }
 
 dependencies {
-	samplesCompile sourceSets.main.compileClasspath
-	samplesCompile sourceSets.main.output
+	samplesImplementation sourceSets.main.compileClasspath
+	samplesImplementation sourceSets.main.output
 
-	testCompile "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
-	testCompile sourceSets.samples.output
+	testImplementation "org.junit.jupiter:junit-jupiter:$junit_jupiter_version"
+	testImplementation sourceSets.samples.output
 }
 
 /*Awaiting checkerframework for Java 12...
