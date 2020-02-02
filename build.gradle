@@ -99,7 +99,7 @@ publishing {
 			pom {
 				name = publish_name
 				description = publish_desc
-				url ='https://github.com/${github_repo_full}'
+				url = "https://github.com/${github_repo_full}"
 				from components.java
 				licenses {
 					license {
@@ -108,27 +108,27 @@ publishing {
 				}
 				developers {
 					developer {
-						id = "Elix-x"
+						id = 'Elix-x'
 						name = 'Elix X'
 						email = 'elix.x.ggl@gmail.com'
 						url = 'https://github.com/Elix-x'
 					}
 				}
 				scm {
-					connection = 'scm:git:git://github.com/${github_repo_full}.git'
-					developerConnection = 'scm:git:ssh://github.com:${github_repo_full}.git'
-					url = 'https://github.com/${github_repo_full}/tree/master'
+					connection = "scm:git:git://github.com/${github_repo_full}.git"
+					developerConnection = "scm:git:ssh://github.com:${github_repo_full}.git"
+					url = "https://github.com/${github_repo_full}/tree/master"
 				}
 			}
 		}
 	}
 	repositories {
 		maven {
-			name = 'GitHub ${github_owner} Maven Packages'
-			url = 'https://maven.pkg.github.com/${github_repo_full}'
+			name = 'GitHubPackages'
+			url = "https://maven.pkg.github.com/${github_repo_full}"
 			credentials {
-				username = System.getenv("GITHUBACCESSUSER")
-				password = System.getenv("GITHUBACCESSTOKEN")
+				username = System.getenv('GITHUBACCESSUSER')
+				password = System.getenv('GITHUBACCESSTOKEN')
 			}
 		}
 	}
