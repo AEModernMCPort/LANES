@@ -14,14 +14,14 @@ public interface ConnectParam<CP extends ConnectParam<CP>> {
 
 	/**
 	 * Checks whether this cp is sufficient for given cp.<br>
-	 * For linear parameters, this method is equivalent to <code>this >= param</code>.
+	 * For linear parameters, this method is equivalent to <code>this {@literal >=} param</code>.
 	 * @param param second cp to check with
 	 * @return <code>this ⊃ cp</code>
 	 */
 	boolean isSufficientFor(@NonNull CP param);
 
 	/**
-	 * Inverse of {@linkplain ConnectParam#isSufficientFor(ConnectParam)} - <tt>this</tt> and <tt>param</tt> are reversed.
+	 * Inverse of {@linkplain ConnectParam#isSufficientFor(ConnectParam)} - <code>this</code> and <code>param</code> are reversed.
 	 * @param param second cp to check with
 	 * @return <code>this ⊂ cp</code>
 	 */
@@ -47,7 +47,7 @@ public interface ConnectParam<CP extends ConnectParam<CP>> {
 
 	/**
 	 * Creates an union of this and given cp.<br>
-	 * An union <tt>u</tt> of <tt>cps</tt> <code>{cp₁, cp₂, ..., cpₙ}</code> is the "smallest" <tt>u</tt> such that <code>∀c∈cps, c⊂u</code>.
+	 * An union <code>u</code> of <code>cps</code> <code>{cp₁, cp₂, ..., cpₙ}</code> is the "smallest" <code>u</code> such that <code>∀c∈cps, c⊂u</code>.
 	 * @param param second cp for union
 	 * @return <code>this ⋃ param</code>
 	 */
@@ -56,7 +56,7 @@ public interface ConnectParam<CP extends ConnectParam<CP>> {
 
 	/**
 	 * Creates an intersection of this and given cp.<br>
-	 * An intersection <tt>i</tt> of <tt>cps</tt> <code>{cp₁, cp₂, ..., cpₙ}</code> is the "largest" <tt>i</tt> such that <code>∀c∈cps, i⊂c</code>.
+	 * An intersection <code>i</code> of <code>cps</code> <code>{cp₁, cp₂, ..., cpₙ}</code> is the "largest" <code>i</code> such that <code>∀c∈cps, i⊂c</code>.
 	 * @param param second cp for intersection
 	 * @return <code>this ⋂ param</code>
 	 */
