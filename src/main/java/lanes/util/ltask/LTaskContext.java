@@ -1,6 +1,5 @@
 package lanes.util.ltask;
 
-import lanes.util.task.Task;
 import org.checkerframework.checker.nullness.qual.NonNull;
 
 import java.util.Collections;
