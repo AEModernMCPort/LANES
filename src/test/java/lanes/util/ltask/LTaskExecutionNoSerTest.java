@@ -23,7 +23,7 @@ public class LTaskExecutionNoSerTest {
 		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
 		for(var i = 0; i < pool; i++){
 			int finalI = i;
-			ctxt.submit(new ParamSleeperTask(sleep, () -> ress[finalI].set(true)));
+			ctxt.submit(new ParamSleeperTask(() -> ress[finalI].set(true), sleep));
 		}
 		long slept = 0;
 		while(slept < sleep + sleep/8) try{
@@ -38,13 +38,13 @@ public class LTaskExecutionNoSerTest {
 		private final Queue<Long> sleeps;
 		private final Runnable finish;
 
-		public ParamSleeperTask(Collection<Long> sleeps, Runnable finish){
+		public ParamSleeperTask(Runnable finish, Collection<Long> sleeps){
 			this.sleeps = new LinkedList<>(sleeps);
 			this.finish = finish;
 		}
 
-		public ParamSleeperTask(long sleep, Runnable finish){
-			this(List.of(sleep), finish);
+		public ParamSleeperTask(Runnable finish, long... sleeps){
+			this(finish, Arrays.stream(sleeps).boxed().collect(Collectors.toList()));
 		}
 
 		@Override
