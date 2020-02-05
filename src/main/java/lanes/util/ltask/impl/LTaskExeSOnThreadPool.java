@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class LTaskExeSOnThreadPool implements LTaskExecutionService {
@@ -109,10 +110,13 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 
 		public void resumeInterrupted(@NonNull InterruptReason reason){
 			this.reason = reason;
-			semaphore.drainPermits();
+			semaphore.release(interruptedTasks.get());
 		}
 
+		protected AtomicInteger interruptedTasks = new AtomicInteger();
+
 		public @NonNull InterruptReason interruptedTaskRequestReason(){
+			interruptedTasks.incrementAndGet();
 			semaphore.acquireUninterruptibly();
 			return reason;
 		}
