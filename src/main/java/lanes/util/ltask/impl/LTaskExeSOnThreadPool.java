@@ -19,8 +19,8 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 	protected final ConcurrentHashMap<Runnable, Thread> runningTasks = new ConcurrentHashMap<>();
 	protected final ConcurrentHashMap<Runnable, RunningTasksInterruptSemaphore> interruptSemaphores = new ConcurrentHashMap<>();
 
-	public LTaskExeSOnThreadPool(@NonNegative int poolSize){
-		this.threadPool = new ControlledThreadPool(0, poolSize, 60L, TimeUnit.SECONDS, this.taskPool = new LinkedBlockingQueue<>());
+	public LTaskExeSOnThreadPool(@NonNegative int corePoolsize, @NonNegative int maxPoolSize){
+		this.threadPool = new ControlledThreadPool(corePoolsize, maxPoolSize, 60L, TimeUnit.SECONDS, this.taskPool = new LinkedBlockingQueue<>());
 	}
 
 	@Override
