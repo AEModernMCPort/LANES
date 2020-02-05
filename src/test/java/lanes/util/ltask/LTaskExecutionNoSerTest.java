@@ -26,7 +26,7 @@ public class LTaskExecutionNoSerTest {
 	@ParameterizedTest
 	@ValueSource(ints = {2, 4, 8, 16})
 	public void testJustParallelExecution(int pool){
-		final long sleep = 1000;
+		final long sleep = 250;
 		var exes = new LTaskExeSOnThreadPool(pool, pool);
 		var ctxt = new SimpleTaskContext(exes);
 		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
