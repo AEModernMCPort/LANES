@@ -6,8 +6,12 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,6 +37,23 @@ public class LTaskExecutionNoSerTest {
 		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep)));
 		mainTSleepFor(sleep);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks executed! - " + Arrays.toString(ress));
+	}
+
+	@ParameterizedTest
+	@ValueSource(ints = {2, 4, 8, 16})
+	public void testInterruptPause(int pool){
+		final long sleep1 = 250, sleepP = 100, sleep2 = 100;
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
+		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep1, sleep2)));
+		mainTSleepFor(sleep1/2);
+		var interruptR = ctxt.interrupt();
+		mainTSleepFor(sleepP);
+		assertTrue(Arrays.stream(ress).noneMatch(AtomicBoolean::get), "Some tasks finished - " + Arrays.toString(ress));
+		interruptR.accept(InterruptReason.PAUSE);
+		mainTSleepFor(sleep2);
+		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
 	}
 
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
