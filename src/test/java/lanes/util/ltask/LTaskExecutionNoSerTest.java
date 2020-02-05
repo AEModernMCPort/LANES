@@ -68,7 +68,9 @@ public class LTaskExecutionNoSerTest {
 			while(sleeps.peek() != null){
 				try {
 					Thread.sleep(sleeps.poll());
-				} catch(InterruptedException e){ }
+				} catch(InterruptedException e){
+					Thread.currentThread().interrupt(); //Re-set the interrupt status
+				}
 				var r = InterruptHelper.interruptSuspendRequestReason(this);
 				if(r.isPresent()) switch(r.get()){
 					case SUSPEND:
