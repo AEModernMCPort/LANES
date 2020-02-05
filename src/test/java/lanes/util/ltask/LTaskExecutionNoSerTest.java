@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,10 +22,7 @@ public class LTaskExecutionNoSerTest {
 		var exes = new LTaskExeSOnThreadPool(pool, pool);
 		var ctxt = new SimpleTaskContext(exes);
 		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
-		for(var i = 0; i < pool; i++){
-			int finalI = i;
-			ctxt.submit(new ParamSleeperTask(() -> ress[finalI].set(true), sleep));
-		}
+		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep)));
 		long slept = 0;
 		while(slept < sleep + sleep/8) try{
 			Thread.sleep(sleep/8);
