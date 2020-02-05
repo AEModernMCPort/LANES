@@ -15,6 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class LTaskExecutionNoSerTest {
 
+	private static void mainTSleepFor(long sleep){
+		long slept = 0;
+		while(slept < sleep + sleep/8) try{
+			Thread.sleep(sleep/8);
+			slept += sleep/8;
+		} catch(InterruptedException e){}
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = {2, 4, 8, 16})
 	public void testJustParallelExecution(int pool){
@@ -23,11 +31,7 @@ public class LTaskExecutionNoSerTest {
 		var ctxt = new SimpleTaskContext(exes);
 		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
 		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep)));
-		long slept = 0;
-		while(slept < sleep + sleep/8) try{
-			Thread.sleep(sleep/8);
-			slept += sleep/8;
-		} catch(InterruptedException e){}
+		mainTSleepFor(sleep);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks executed! - " + Arrays.toString(ress));
 	}
 
