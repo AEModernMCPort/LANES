@@ -4,6 +4,7 @@ import lanes.util.ltask.impl.LTaskExeSOnThreadPool;
 import lanes.util.ltask.impl.SimpleTaskContext;
 import net.jodah.concurrentunit.Waiter;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -96,6 +97,41 @@ public class LTaskExecutionNoSerTest {
 		assertTrue(Arrays.stream(ress).noneMatch(AtomicBoolean::get), "Some tasks finished - " + Arrays.toString(ress));
 		ctxt.resume();
 		mainTSleepFor(sleep2);
+		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+		exes.shutdown();
+	}
+
+	@Test
+	public void testAddingTasksDuringInterruptThenSuspend(){
+		final long sleep = 100;
+		final int pool = 3;
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
+		ctxt.submit(new ParamSleeperTask(() -> ress[0].set(true), sleep, sleep, sleep));
+		mainTSleepFor(sleep/5);
+
+		var interruptR = ctxt.interrupt();
+		ctxt.submit(new ParamSleeperTask(() -> ress[1].set(true), sleep, sleep, sleep));
+		mainTSleepFor(sleep);
+		assertFalse(ress[1].get(), "Task submitted during interrupted was run");
+		interruptR.accept(InterruptReason.PAUSE);
+
+		interruptR = ctxt.interrupt();
+		ctxt.submit(new ParamSleeperTask(() -> ress[2].set(true), sleep, sleep, sleep));
+		mainTSleepFor(sleep);
+		assertFalse(ress[2].get(), "Task submitted during interrupted was run");
+		interruptR.accept(InterruptReason.SUSPEND);
+		try{
+			ctxt.awaitSuspension();
+		} catch(InterruptedException e){
+			fail("Waiting for suspension was interrupted", e);
+		}
+		mainTSleepFor(sleep);
+		assertFalse(ress[2].get(), "Task submitted during older interrupt was run after suspension");
+		assertFalse(ress[2].get(), "Task submitted during interrupt was run after suspension");
+		ctxt.resume();
+		mainTSleepFor(sleep*3);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
 		exes.shutdown();
 	}
