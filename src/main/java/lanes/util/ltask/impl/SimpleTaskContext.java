@@ -86,6 +86,7 @@ public class SimpleTaskContext implements LTaskContext {
 		while(multintr != null) try {
 			multintr.await();
 			multintr = null;
+			stateLock.lock();
 			try {
 				switch(state){
 					case TERMINATED:
