@@ -144,7 +144,7 @@ public class LTaskExecutionNoSerTest {
 		}, baseSleep/2));
 		piCtxt.submit(new ParamSleeperTask(() -> {
 			try {
-				assertThrows(IllegalStateException.class, () -> ctxt.interrupt().accept(InterruptReason.PAUSE));
+				assertThrows(IllegalStateException.class, () -> ctxt.interrupt().accept(InterruptReason.PAUSE), "Interrupting terminated context didn't fail");
 				waiter.resume();
 			} catch(AssertionFailedError e){
 				waiter.rethrow(e);
