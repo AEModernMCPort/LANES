@@ -130,16 +130,17 @@ public class LTaskExecutionNoSerTest {
 
 		@Override
 		public void run(){
-			while(sleeps.peek() != null){
-				try {
-					Thread.sleep(sleeps.poll());
-				} catch(InterruptedException e){
-					Thread.currentThread().interrupt(); //Re-set the interrupt status
-				}
+			while(true){
 				var r = InterruptHelper.interruptSuspendRequestReason(this);
 				if(r.isPresent()) switch(r.get()){
 					case SUSPEND:
 					case TERMINATE: return;
+				}
+				else try {
+					if(sleeps.isEmpty()) break;
+					Thread.sleep(sleeps.poll());
+				} catch(InterruptedException e){
+					Thread.currentThread().interrupt(); //Re-set the interrupt status
 				}
 			}
 			if(finish != null) finish.run();
