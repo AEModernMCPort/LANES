@@ -115,6 +115,10 @@ public class SimpleTaskContext implements LTaskContext {
 					case SUSPEND:
 						state = ContextState.SUSPENDING;
 						suspended = new HashSet<>(tasks);
+						if(!submittedDuringInterrupt.isEmpty()){
+							suspended.addAll(submittedDuringInterrupt);
+							submittedDuringInterrupt = new LinkedList<>();
+						}
 						suspendingRunningLatch = new CountDownLatch(runningTasks.size());
 						break;
 					case TERMINATE:
