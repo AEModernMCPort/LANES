@@ -22,9 +22,10 @@ public interface LTask<T extends LTask<T>> extends Runnable {
 	@NonNull LTaskContext getContext();
 
 	/**
-	 * Initialize context for this task, usually from {@link LTaskContext#submit(LTask)}.
+	 * Initialize context for this task, usually from {@link LTaskContext#submit(LTask)}.<br>
+	 * Errors if the context is already initialized, unless the <code>context</code> passed is the one already assigned (in which case calling this has no effect).
 	 * @param context context for this task
-	 * @throws UnsupportedOperationException if the task already has a context
+	 * @throws UnsupportedOperationException if the task already has a [different] context
 	 */
 	void setContext(@NonNull LTaskContext context);
 

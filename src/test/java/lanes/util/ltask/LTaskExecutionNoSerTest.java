@@ -100,7 +100,7 @@ public class LTaskExecutionNoSerTest {
 
 		@Override
 		public void setContext(@NonNull LTaskContext context){
-			if(this.context != null) throw new UnsupportedOperationException();
+			if(this.context != null && this.context != context) throw new UnsupportedOperationException();
 			this.context = context;
 		}
 
