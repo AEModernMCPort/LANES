@@ -2,7 +2,6 @@ package lanes.util.ltask;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 
-import java.util.Collections;
 import java.util.function.Consumer;
 
 //TODO Write a chunky paragraph on context and its' states, because oh boy aren't they just fun
@@ -56,9 +55,7 @@ public interface LTaskContext {
 	 * @param <T> task type
 	 * @return a consumer ready to consume the reason for the interrupt, and act accordingly, once the interrupt is over
 	 */
-	default <T extends LTask<T>> @NonNull Consumer<InterruptReason> interruptTask(@NonNull T task){
-		return executionService().interruptTasks(Collections.singletonList(task));
-	}
+	<T extends LTask<T>> @NonNull Consumer<InterruptReason> interruptTask(@NonNull T task);
 
 	default <T extends LTask<T>> void taskStartedExecution(@NonNull T task){}
 	default <T extends LTask<T>> void taskEndedExecution(@NonNull T task){}
