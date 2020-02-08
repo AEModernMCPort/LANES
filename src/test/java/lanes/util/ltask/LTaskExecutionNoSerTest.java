@@ -139,7 +139,7 @@ public class LTaskExecutionNoSerTest {
 				var r = InterruptHelper.interruptSuspendRequestReason(this);
 				if(r.isPresent()) switch(r.get()){
 					case SUSPEND:
-					case TERMINATE: if(!sleeps.isEmpty()) return;
+					case TERMINATE: return;
 				}
 			}
 			if(finish != null) finish.run();
