@@ -136,6 +136,36 @@ public class LTaskExecutionNoSerTest {
 		exes.shutdown();
 	}
 
+	@Test
+	public void testInterruptSingleTask(){
+		final long sleep1 = 250, sleep2 = 100;
+		final int pool = 8;
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
+		IntStream.range(0, pool-2).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep1, sleep2)));
+		var pausedTask = new ParamSleeperTask(() -> ress[pool-2].set(true), sleep1, sleep2);
+		var suspendedTask = new ParamSleeperTask(() -> ress[pool-1].set(true), sleep1, sleep2);
+		ctxt.submit(pausedTask);
+		ctxt.submit(suspendedTask);
+		mainTSleepFor(sleep1/2);
+		var pInterruptR = ctxt.interruptTask(pausedTask);
+		var sInterruptR = ctxt.interruptTask(suspendedTask);
+		mainTSleepFor(sleep1+sleep2);
+		assertFalse(ress[pool-2].get(), "Interrupted task completed");
+		assertFalse(ress[pool-1].get(), "Interrupted task completed");
+		pInterruptR.accept(InterruptReason.PAUSE);
+		sInterruptR.accept(InterruptReason.SUSPEND);
+		mainTSleepFor(sleep2);
+		assertTrue(ress[pool-2].get(), "Resumed paused task did not complete");
+		assertFalse(ress[pool-1].get(), "Suspended task completed");
+		ctxt.submit(suspendedTask);
+		mainTSleepFor(sleep2);
+		assertTrue(ress[pool-1].get(), "Resumed suspended task did not complete");
+		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+		exes.shutdown();
+	}
+
 	@ParameterizedTest
 	@ValueSource(ints = {2, 5, 10})
 	public void testMultiInterrupts(int interrupts){
