@@ -156,6 +156,8 @@ public class LTaskExecutionNoSerTest {
 		} catch(TimeoutException | InterruptedException e){
 			fail("Something went wrong when awaiting", e);
 		}
+		exes.shutdown();
+		piExes.shutdown();
 	}
 
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
