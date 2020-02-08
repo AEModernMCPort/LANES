@@ -63,8 +63,12 @@ public class SimpleTaskContext implements LTaskContext {
 		tasks.add(task);
 	}
 
-	@Override
-	public @NonNull Consumer<InterruptReason> interrupt(){
+	/**
+	 * Awaits for preceding interrupts to resolve
+	 * @param setInterrupted whether to actually interrupt the context (set the state to interrupted)
+	 * @throws IllegalStateException if when the resolved stated is invalid for interruption
+	 */
+	protected void awaitMultinterrupt(boolean setInterrupted){
 		stateLock.lock();
 		CountDownLatch multintr = null;
 		try {
@@ -77,7 +81,7 @@ public class SimpleTaskContext implements LTaskContext {
 					multiInterrupts.add(multintr = new CountDownLatch(1));
 					break;
 				case FREE:
-					state = ContextState.INTERRUPTED;
+					if(setInterrupted) state = ContextState.INTERRUPTED;
 					break;
 			}
 		} finally {
@@ -94,11 +98,16 @@ public class SimpleTaskContext implements LTaskContext {
 					case SUSPENDING:
 						throw new IllegalStateException();
 				}
-				state = ContextState.INTERRUPTED;
+				if(setInterrupted) state = ContextState.INTERRUPTED;
 			} finally {
 				stateLock.unlock();
 			}
 		} catch(InterruptedException e){}
+	}
+
+	@Override
+	public @NonNull Consumer<InterruptReason> interrupt(){
+		awaitMultinterrupt(true);
 		var sc = executionService.interruptTasks(tasks);
 		return reason -> {
 			stateLock.lock();
