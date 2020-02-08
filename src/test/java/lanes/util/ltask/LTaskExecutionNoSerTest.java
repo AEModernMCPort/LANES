@@ -96,6 +96,33 @@ public class LTaskExecutionNoSerTest {
 		exes.shutdown();
 	}
 
+	@ParameterizedTest
+	@ValueSource(ints = {2, 5, 10})
+	public void testMultiInterrupts(int interrupts){
+		final long baseSleep = 100;
+		final long[] sleeps = {baseSleep, baseSleep, baseSleep, baseSleep, baseSleep};
+		final int pool = 8;
+		var piExes = new LTaskExeSOnThreadPool(interrupts, interrupts);
+		var piCtxt = new SimpleTaskContext(piExes);
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
+		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleeps)));
+		IntStream.range(0, interrupts).forEach(i -> piCtxt.submit(new ParamSleeperTask(() -> {
+			var irr = ctxt.interrupt();
+			try{
+				Thread.sleep(150);
+			} catch(InterruptedException e){}
+			irr.accept(InterruptReason.PAUSE);
+		}, (i+1)*50)));
+		mainTSleepFor(50+interrupts/2*150);
+		assertTrue(Arrays.stream(ress).noneMatch(AtomicBoolean::get), "Some tasks finished - " + Arrays.toString(ress));
+		mainTSleepFor(interrupts/2*150 + baseSleep*sleeps.length);
+		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+		exes.shutdown();
+		piExes.shutdown();
+	}
+
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
 
 		private final Queue<Long> sleeps;
