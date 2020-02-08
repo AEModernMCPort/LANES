@@ -177,7 +177,7 @@ public class SimpleTaskContext implements LTaskContext {
 		} finally {
 			stateLock.unlock();
 		}
-		suspendeds.forEach(this::submit);
+		if(suspendeds != null) suspendeds.forEach(this::submit); //suspendeds is null when invoked when running or interrupted
 	}
 
 	@Override
