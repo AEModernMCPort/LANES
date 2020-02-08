@@ -2,14 +2,18 @@ package lanes.util.ltask;
 
 import lanes.util.ltask.impl.LTaskExeSOnThreadPool;
 import lanes.util.ltask.impl.SimpleTaskContext;
+import net.jodah.concurrentunit.Waiter;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.opentest4j.AssertionFailedError;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -121,6 +125,37 @@ public class LTaskExecutionNoSerTest {
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
 		exes.shutdown();
 		piExes.shutdown();
+	}
+
+	@ParameterizedTest
+	@EnumSource(value = InterruptReason.class, names = {"SUSPEND", "TERMINATE"})
+	public void testMultiInterruptsThrows(InterruptReason treason){
+		final long baseSleep = 100;
+		final int pool = 8;
+		var piExes = new LTaskExeSOnThreadPool(2, 2);
+		var piCtxt = new SimpleTaskContext(piExes);
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		var waiter = new Waiter();
+		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(null, baseSleep, baseSleep, baseSleep, baseSleep, baseSleep)));
+		piCtxt.submit(new ParamSleeperTask(() -> {
+			ctxt.interrupt().accept(InterruptReason.TERMINATE);
+			waiter.resume();
+		}, baseSleep/2));
+		piCtxt.submit(new ParamSleeperTask(() -> {
+			try {
+				assertThrows(IllegalStateException.class, () -> ctxt.interrupt().accept(InterruptReason.PAUSE));
+				waiter.resume();
+			} catch(AssertionFailedError e){
+				waiter.rethrow(e);
+			}
+		}, baseSleep));
+		mainTSleepFor(baseSleep*8);
+		try{
+			waiter.await(2000, 2);
+		} catch(TimeoutException | InterruptedException e){
+			fail("Something went wrong when awaiting", e);
+		}
 	}
 
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
