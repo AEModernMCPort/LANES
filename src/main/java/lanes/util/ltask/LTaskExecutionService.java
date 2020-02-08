@@ -27,4 +27,11 @@ public interface LTaskExecutionService {
 
 	@NonNull Consumer<InterruptReason> interruptTasks(@NonNull Collection<LTask> tasks);
 
+	/**
+	 * Initiates a shutdown of this execution service.<br>
+	 * Returns immediately - eventually the threads will stop and resources released.<br>
+	 * Once initiated, any and all methods relying on the executor running can ignore the specifications and do whatever. Thus, <b>you should initiate the shutdown of the executor only after terminating(/suspending) all the contexts</b> [bound to the executor]; interrupting the context(s) and asking them to suspend/terminate, without awaiting, is enough to correctly initiate shutdown of the executor.
+	 */
+	void shutdown();
+
 }

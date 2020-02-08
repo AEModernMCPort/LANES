@@ -68,6 +68,11 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 		if(run instanceof LTask) ((LTask) run).getContext().taskEndedExecution((LTask) run);
 	}
 
+	@Override
+	public void shutdown(){
+		threadPool.shutdown();
+	}
+
 	public class ControlledThreadPool extends ThreadPoolExecutor {
 
 		private final PauseWaitingLock pauseLock = new PauseWaitingLock();
