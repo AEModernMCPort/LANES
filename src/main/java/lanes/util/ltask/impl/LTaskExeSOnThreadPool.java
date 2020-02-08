@@ -38,6 +38,7 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 			var thread = runningTasks.get(task);
 			if(thread != null){
 				if(semaphore == null) semaphore = new RunningTasksInterruptSemaphore();
+				semaphore.taskInterruptedWillJoin();
 				interruptSemaphores.put(task, semaphore);
 				thread.interrupt();
 			}
@@ -106,6 +107,12 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 
 		protected final Semaphore semaphore = new Semaphore(0);
 
+		protected AtomicInteger interruptedTasks = new AtomicInteger();
+
+		public void taskInterruptedWillJoin(){
+			interruptedTasks.incrementAndGet();
+		}
+
 		protected InterruptReason reason;
 
 		public void resumeInterrupted(@NonNull InterruptReason reason){
@@ -113,10 +120,7 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 			semaphore.release(interruptedTasks.get());
 		}
 
-		protected AtomicInteger interruptedTasks = new AtomicInteger();
-
 		public @NonNull InterruptReason interruptedTaskRequestReason(){
-			interruptedTasks.incrementAndGet();
 			semaphore.acquireUninterruptibly();
 			return reason;
 		}
