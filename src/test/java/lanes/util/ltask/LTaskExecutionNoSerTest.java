@@ -37,6 +37,7 @@ public class LTaskExecutionNoSerTest {
 		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep)));
 		mainTSleepFor(sleep);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks executed! - " + Arrays.toString(ress));
+		exes.shutdown();
 	}
 
 	@ParameterizedTest
@@ -54,6 +55,7 @@ public class LTaskExecutionNoSerTest {
 		interruptR.accept(InterruptReason.PAUSE);
 		mainTSleepFor(sleep2);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+		exes.shutdown();
 	}
 
 	@ParameterizedTest
@@ -70,6 +72,7 @@ public class LTaskExecutionNoSerTest {
 		ctxt.interrupt().accept(InterruptReason.TERMINATE);
 		assertTrue(Arrays.stream(ressG1).allMatch(AtomicBoolean::get), "Some tasks of group 1 got terminated - " + Arrays.toString(ressG1));
 		assertTrue(Arrays.stream(ressG2).noneMatch(AtomicBoolean::get), "Not all tasks of group 2 got terminated - " + Arrays.toString(ressG2));
+		exes.shutdown();
 	}
 
 	@ParameterizedTest
@@ -90,6 +93,7 @@ public class LTaskExecutionNoSerTest {
 		ctxt.resume();
 		mainTSleepFor(sleep2);
 		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+		exes.shutdown();
 	}
 
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
