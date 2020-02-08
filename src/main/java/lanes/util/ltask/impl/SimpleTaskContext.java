@@ -148,6 +148,12 @@ public class SimpleTaskContext implements LTaskContext {
 	}
 
 	@Override
+	public @NonNull <T extends LTask<T>> Consumer<InterruptReason> interruptTask(@NonNull T task){
+		awaitMultinterrupt(false);
+		return executionService.interruptTasks(Collections.singletonList(task));
+	}
+
+	@Override
 	public void awaitSuspension() throws InterruptedException {
 		stateLock.lock();
 		try {
