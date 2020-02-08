@@ -24,6 +24,10 @@ public class LTaskExeSOnThreadPool implements LTaskExecutionService {
 		this.threadPool = new ControlledThreadPool(corePoolsize, maxPoolSize, 60L, TimeUnit.SECONDS, this.taskPool = new LinkedBlockingQueue<>());
 	}
 
+	public LTaskExeSOnThreadPool(@NonNegative int corePoolsize, @NonNegative int maxPoolSize, @NonNull ThreadFactory factory){
+		this.threadPool = new ControlledThreadPool(corePoolsize, maxPoolSize, 60L, TimeUnit.SECONDS, this.taskPool = new LinkedBlockingQueue<>(), factory);
+	}
+
 	@Override
 	public <T extends LTask<T>> void submit(@NonNull T task){
 		threadPool.execute(task);
