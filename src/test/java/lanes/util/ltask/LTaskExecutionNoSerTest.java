@@ -72,6 +72,26 @@ public class LTaskExecutionNoSerTest {
 		assertTrue(Arrays.stream(ressG2).noneMatch(AtomicBoolean::get), "Not all tasks of group 2 got terminated - " + Arrays.toString(ressG2));
 	}
 
+	@ParameterizedTest
+	@ValueSource(ints = {2, 4, 8, 16})
+	public void testInterruptSuspendAsPause(int pool){
+		final long sleep1 = 250, sleep2 = 100;
+		var exes = new LTaskExeSOnThreadPool(pool, pool);
+		var ctxt = new SimpleTaskContext(exes);
+		AtomicBoolean[] ress = Stream.generate(AtomicBoolean::new).limit(pool).toArray(AtomicBoolean[]::new);
+		IntStream.range(0, pool).forEach(i -> ctxt.submit(new ParamSleeperTask(() -> ress[i].set(true), sleep1, sleep2)));
+		mainTSleepFor(sleep1/4);
+		ctxt.interrupt().accept(InterruptReason.SUSPEND);
+		while(true) try {
+			ctxt.awaitSuspension();
+			break;
+		} catch(InterruptedException e){}
+		assertTrue(Arrays.stream(ress).noneMatch(AtomicBoolean::get), "Some tasks finished - " + Arrays.toString(ress));
+		ctxt.resume();
+		mainTSleepFor(sleep2);
+		assertTrue(Arrays.stream(ress).allMatch(AtomicBoolean::get), "Not all tasks finished - " + Arrays.toString(ress));
+	}
+
 	protected static class ParamSleeperTask implements LTask<ParamSleeperTask> {
 
 		private final Queue<Long> sleeps;
